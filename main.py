@@ -21,28 +21,28 @@ def main():
     running = True
 
     while running:
+        # Cap the frame rate
         dt = clock.tick(60)
+
         # Handle events
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 running = False
 
+        # Draw background
+        screen.fill(BG_COLOR)
+
         # Update game state
         # (Insert game logic here)
-        p.update()
 
-        # Draw everything
-        screen.fill(BG_COLOR)
         # (Insert drawing code here)
-        p.draw(dt)
+        p.update(events, dt)
         debug(p.status)
         debug(p.facing, 30)
 
         # Update the display
         pygame.display.flip()
-
-        # Cap the frame rate
-        # dt = clock.tick(60)
 
     # Clean up
     pygame.quit()
