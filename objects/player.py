@@ -5,8 +5,8 @@ class Player(pygame.sprite.Sprite):
     RUNNING = "running"
     ATTACKING = "attacking"
 
-    ANIMATION_SPEED = 60
-    ATTACK_ANIMATION_SPEED = 80
+    ANIMATION_SPEED = 90
+    ATTACK_ANIMATION_SPEED = 90
 
     ATTACK_RECT = (72, 37)
 
@@ -15,10 +15,17 @@ class Player(pygame.sprite.Sprite):
         pygame.init()
         self.screen = pygame.display.get_surface()
 
-        self.size = (32, 48)
-        self.scale = 3
+        self.width = 32
+        self.height = 48
+        self.scale = 7
         self.sprites = {}
         self._load_sprites()
+        self.diffs = {
+            self.IDLE: 0,
+            self.RUNNING: 0,
+            self.ATTACKING: self.ATTACK_RECT[0] * self.scale
+        }
+        
         self.image = self.sprites[self.IDLE][0]
         self.rect = self.image.get_rect()
 
@@ -39,14 +46,16 @@ class Player(pygame.sprite.Sprite):
             self.current_frame += 1
             self.time_since_last_frame = 0
 
-        if self.current_frame >= len(self.sprites[self.status]) or self.status != self.previous_status:
+        if self.current_frame >= len(self.sprites[self.status]):
             self.current_frame = 0
 
         self.image = self.sprites[self.status][self.current_frame]
         if self.facing == "left":
             self.image = pygame.transform.flip(self.image, True, False)
-
-        self.screen.blit(self.image, self.rect.topleft)
+            diff = self.diffs[self.status]
+            self.screen.blit(self.image, (self.rect.x - diff, self.rect.y))
+        else:
+            self.screen.blit(self.image, self.rect.topleft)
 
 
     def move(self):
@@ -68,25 +77,23 @@ class Player(pygame.sprite.Sprite):
         self.status = self.ATTACKING
         self.animation_speed = self.ATTACK_ANIMATION_SPEED
         self.current_frame = 0
-        if self.facing == "left":
-            self.rect.left = self.rect.right - 48
 
 
     def handle_events(self):
         for event in self.events:
-            print(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                self.attack()
+                if self.status != self.ATTACKING:
+                    self.attack()
 
 
     def _load_sprite_sheet(self, filepath, frame_count, frame_height=None, frame_width=None):
         spritesheet = pygame.image.load(filepath)
         sprites = []
         for i in range(frame_count):
-            width = frame_width if frame_width else self.size[0]
-            height = frame_height if frame_height else self.size[1]
+            width = frame_width if frame_width else self.width
+            height = frame_height if frame_height else self.height
             frame = pygame.transform.scale(
-                spritesheet.subsurface(pygame.Rect(0, i * self.size[1], self.size[0], self.size[1])),
+                spritesheet.subsurface(pygame.Rect(0, i * self.height, self.width, self.height)),
                 (width * self.scale, height * self.scale)
             )
             sprites.append(frame)
@@ -108,10 +115,10 @@ class Player(pygame.sprite.Sprite):
         attack_spritesheet = pygame.image.load("sprites/blue-witch/B_witch_attack.png")
         attack_sprites = []
         for i in range(6):
-            frame = pygame.transform.scale(idle_spritesheet.subsurface(pygame.Rect(0, i*self.size[1], self.size[0], self.size[1])), (self.size[0]*self.scale, self.size[1]*self.scale))
+            frame = pygame.transform.scale(idle_spritesheet.subsurface(pygame.Rect(0, i*self.height, self.width, self.height)), (self.width*self.scale, self.height*self.scale))
             idle_sprites.append(frame)
         for i in range(8):
-            frame = pygame.transform.scale(running_spritesheet.subsurface(pygame.Rect(0, i*self.size[1], self.size[0], self.size[1])), (self.size[0]*self.scale, self.size[1]*self.scale))
+            frame = pygame.transform.scale(running_spritesheet.subsurface(pygame.Rect(0, i*self.height, self.width, self.height)), (self.width*self.scale, self.height*self.scale))
             running_sprites.append(frame)
         for i in range(9):
             frame = pygame.transform.scale(attack_spritesheet.subsurface(pygame.Rect(0, i*46, 104, 46)), (104*self.scale, 46*self.scale))

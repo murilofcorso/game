@@ -42,6 +42,7 @@ def main():
         player.draw()
         debug(player.status)
         debug(player.facing, 30)
+        debug(player.rect, 50)
 
         # Update the display
         pygame.display.flip()
