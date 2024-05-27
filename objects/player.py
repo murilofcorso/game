@@ -1,6 +1,15 @@
 import pygame
 
 class Player(pygame.sprite.Sprite):
+    IDLE = "idle"
+    RUNNING = "running"
+    ATTACKING = "attacking"
+
+    ANIMATION_SPEED = 60
+    ATTACK_ANIMATION_SPEED = 80
+
+    ATTACK_RECT = (72, 37)
+
     def __init__(self):
         super().__init__()
         pygame.init()
@@ -10,62 +19,57 @@ class Player(pygame.sprite.Sprite):
         self.scale = 3
         self.sprites = {}
         self._load_sprites()
-        self.image = self.sprites["idle"][0]
+        self.image = self.sprites[self.IDLE][0]
         self.rect = self.image.get_rect()
 
         self.facing = "right"
-        self.status = "idle"
-        self.ultimo_status = self.status
+        self.status = self.IDLE
+        self.previous_status = self.status
         self.speed = 4
 
         self.current_frame = 0
         self.time_since_last_frame = 0
-        self.animation_speed = 60
-        self.attack_animation_speed = 30
+        self.animation_speed = self.ANIMATION_SPEED
 
 
     def draw(self):
         self.time_since_last_frame += self.dt
 
-        # Setting spritesheet animation speed
         if self.time_since_last_frame >= self.animation_speed:
             self.current_frame += 1
             self.time_since_last_frame = 0
 
-        # Restarting spritesheet loop
-        if (self.current_frame >= len(self.sprites[self.status])) or (self.status != self.ultimo_status):
+        if self.current_frame >= len(self.sprites[self.status]) or self.status != self.previous_status:
             self.current_frame = 0
 
-        # Fliping player according to "self.facing"
+        self.image = self.sprites[self.status][self.current_frame]
         if self.facing == "left":
-            self.image = pygame.transform.flip(self.sprites[self.status][self.current_frame], True, False)
-        else:
-            self.image = self.sprites[self.status][self.current_frame]
+            self.image = pygame.transform.flip(self.image, True, False)
 
-        # Placing player image on screen
         self.screen.blit(self.image, self.rect.topleft)
 
 
     def move(self):
-        # Getting all pressed keys
-        keys = pygame.key.get_pressed()  
-        # Movement keys
-        if keys[pygame.K_a]:
-            self.rect.x -= self.speed
-            self.facing = "left"
-            self.status = "running"
-        if keys[pygame.K_d]:
-            self.rect.x += self.speed
-            self.facing = "right"
-            self.status = "running"
-        if not any(list(keys)):
-            self.status = "idle"
-        if keys[pygame.K_SPACE]:
-            pass
+        keys = pygame.key.get_pressed()
+        if self.status != self.ATTACKING:
+            self.status = self.IDLE
+
+            if keys[pygame.K_a]:
+                self.rect.x -= self.speed
+                self.facing = "left"
+                self.status = self.RUNNING
+            if keys[pygame.K_d]:
+                self.rect.x += self.speed
+                self.facing = "right"
+                self.status = self.RUNNING
 
 
     def attack(self):
-        print("atacking")
+        self.status = self.ATTACKING
+        self.animation_speed = self.ATTACK_ANIMATION_SPEED
+        self.current_frame = 0
+        if self.facing == "left":
+            self.rect.left = self.rect.right - 48
 
 
     def handle_events(self):
@@ -73,6 +77,25 @@ class Player(pygame.sprite.Sprite):
             print(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.attack()
+
+
+    def _load_sprite_sheet(self, filepath, frame_count, frame_height=None, frame_width=None):
+        spritesheet = pygame.image.load(filepath)
+        sprites = []
+        for i in range(frame_count):
+            width = frame_width if frame_width else self.size[0]
+            height = frame_height if frame_height else self.size[1]
+            frame = pygame.transform.scale(
+                spritesheet.subsurface(pygame.Rect(0, i * self.size[1], self.size[0], self.size[1])),
+                (width * self.scale, height * self.scale)
+            )
+            sprites.append(frame)
+        return sprites
+    
+    def _load_sprites(self):
+        self.sprites[self.IDLE] = self._load_sprite_sheet("sprites/blue-witch/B_witch_idle.png", 6)
+        self.sprites[self.RUNNING] = self._load_sprite_sheet("sprites/blue-witch/B_witch_run.png", 8)
+        self.sprites[self.ATTACKING] = self._load_sprite_sheet("sprites/blue-witch/B_witch_attack.png", 9, frame_height=46, frame_width=104)
 
 
     def _load_sprites(self):
@@ -100,11 +123,13 @@ class Player(pygame.sprite.Sprite):
 
 
     def update(self, events, dt):
-        self.dt =  dt
+        self.dt = dt
         self.events = events
-        self.draw()
         self.handle_events()
         self.move()
-        self.ultimo_status = self.status
+        self.previous_status = self.status
+        if self.status == self.ATTACKING and self.current_frame >= len(self.sprites[self.ATTACKING]) - 1:
+            self.status = self.IDLE
+            self.animation_speed = self.ANIMATION_SPEED
         
 

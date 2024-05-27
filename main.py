@@ -12,7 +12,9 @@ pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Game")
 
-p = Player()
+player = Player()
+all_sprites = pygame.sprite.Group()
+all_sprites.add(player)
 
 # Main loop
 def main():
@@ -30,16 +32,16 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        # Draw background
-        screen.fill(BG_COLOR)
-
         # Update game state
         # (Insert game logic here)
+        all_sprites.update(events, dt)
 
+        # Draw background
+        screen.fill(BG_COLOR)
         # (Insert drawing code here)
-        p.update(events, dt)
-        debug(p.status)
-        debug(p.facing, 30)
+        player.draw()
+        debug(player.status)
+        debug(player.facing, 30)
 
         # Update the display
         pygame.display.flip()
