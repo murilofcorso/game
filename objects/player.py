@@ -1,6 +1,7 @@
 import pygame
+from objects.character import Character
 
-class Player(pygame.sprite.Sprite):
+class Player(Character):
     IDLE = "idle"
     RUNNING = "running"
     ATTACKING = "attacking"
@@ -13,7 +14,6 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self):
         super().__init__()
-        pygame.init()
         self.screen = pygame.display.get_surface()
 
         self.width = 32
@@ -48,26 +48,6 @@ class Player(pygame.sprite.Sprite):
         self.animation_speed = self.ANIMATION_SPEED
 
 
-    def draw(self):
-        self.time_since_last_frame += self.dt
-
-        if self.time_since_last_frame >= self.animation_speed:
-            self.current_frame += 1
-            self.time_since_last_frame = 0
-
-        if self.current_frame >= len(self.sprites[self.status]):
-            self.current_frame = 0
-
-        self.image = self.sprites[self.status][self.current_frame]
-        offsets = self.sprite_offsets[self.status]
-        if self.facing == "left":
-            self.image = pygame.transform.flip(self.image, True, False)
-            flipped_offset = self.flipped_sprite_offsets[self.status]
-            self.screen.blit(self.image, (self.rect.x - flipped_offset - offsets[0], self.rect.y - offsets[1]))
-        else:
-            self.screen.blit(self.image, (self.rect.x - offsets[0], self.rect.y - offsets[1]))
-
-
     def move(self):
         keys = pygame.key.get_pressed()
         if self.status not in self.ATTACKING:
@@ -100,19 +80,6 @@ class Player(pygame.sprite.Sprite):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.status != self.ATTACKING:
                     self.attack()
-
-
-    def _load_sprite_sheet(self, filepath, frame_count, frame_height=None, frame_width=None):
-        spritesheet = pygame.image.load(filepath)
-        sprites = []
-        for i in range(frame_count):
-            width = frame_width if frame_width else self.width
-            height = frame_height if frame_height else self.height
-
-            frame = pygame.transform.scale(spritesheet.subsurface(pygame.Rect(0, i*height, width, height)), (width*self.scale, height*self.scale))
-            sprites.append(frame)
-        return sprites
-    
 
     def _load_sprites(self):
         self.sprites[self.IDLE] = self._load_sprite_sheet("sprites/blue-witch/B_witch_idle.png", 6)

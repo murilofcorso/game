@@ -2,7 +2,7 @@ import pygame
 import sys
 from configs import *
 from objects.player import Player
-import os
+from objects.enemy import Enemy
 from debug import debug
 
 # Initialize Pygame
@@ -13,12 +13,13 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Game")
 
 player = Player()
+enemy = Enemy()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
+all_sprites.add(enemy)
 
 # Main loop
 def main():
-    # os.system("cls")
     clock = pygame.time.Clock()
     running = True
 
@@ -40,6 +41,8 @@ def main():
         screen.fill(BG_COLOR)
         # (Insert drawing code here)
         player.draw()
+        enemy.draw()
+
         debug(player.status)
         debug(player.facing, 30)
         debug(player.rect, 50)
