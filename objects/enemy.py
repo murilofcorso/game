@@ -9,8 +9,8 @@ class Enemy(Character):
 
     ANIMATION_SPEED = 100
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, groups):
+        super().__init__(groups)
         self.screen = pygame.display.get_surface()
 
         self.scale = 4

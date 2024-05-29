@@ -9,15 +9,15 @@ class Player(Character):
     CHARGING = "charging"
 
     ANIMATION_SPEED = 60
-    ATTACK_ANIMATION_SPEED = 500
+    ATTACK_ANIMATION_SPEED = 50
 
     ATTACK_RECT = (78, 37)
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, groups):
+        super().__init__(groups)
         self.screen = pygame.display.get_surface()
 
-        self.scale = 7
+        self.scale = 4
         self.width = 32
         self.height = 48
         self.sprites = {}
@@ -93,12 +93,13 @@ class Player(Character):
     def create_attack_hitbox(self):
         if self.status == self.ATTACKING and self.current_frame > 4:
             if self.facing[0] == 1:
-                attack_hitbox = pygame.Rect(self.hitbox.right, self.hitbox.top, self.ATTACK_RECT[0]*self.scale, self.ATTACK_RECT[1]*self.scale)
+                self.attack_hitbox = pygame.Rect(self.hitbox.right, self.hitbox.top, self.ATTACK_RECT[0]*self.scale, self.ATTACK_RECT[1]*self.scale)
             elif self.facing[0] == -1:
-                attack_hitbox = pygame.Rect(self.hitbox.left - self.ATTACK_RECT[0]*self.scale, self.hitbox.top, self.ATTACK_RECT[0]*self.scale, self.ATTACK_RECT[1]*self.scale)
+                self.attack_hitbox = pygame.Rect(self.hitbox.left - self.ATTACK_RECT[0]*self.scale, self.hitbox.top, self.ATTACK_RECT[0]*self.scale, self.ATTACK_RECT[1]*self.scale)
+        else:
+            self.attack_hitbox = pygame.Rect(0, 0, 0, 0)
+        pygame.draw.rect(self.screen, (0, 0, 0), self.attack_hitbox)
 
-    def check_attack_collisions(self):
-        pass
 
     def _load_sprites(self):
         self.sprites[self.IDLE] = self._load_sprite_sheet("sprites/blue-witch/B_witch_idle.png", 6)

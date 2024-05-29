@@ -1,8 +1,7 @@
 import pygame
 import sys
 from configs import *
-from objects.player import Player
-from objects.enemy import Enemy
+from map import Map
 from debug import debug
 
 # Initialize Pygame
@@ -12,11 +11,7 @@ pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Game")
 
-player = Player()
-enemy = Enemy()
-all_sprites = pygame.sprite.Group()
-all_sprites.add(player)
-all_sprites.add(enemy)
+map = Map()
 
 # Main loop
 def main():
@@ -35,21 +30,15 @@ def main():
 
         # Update game state
         # (Insert game logic here)
-        all_sprites.update(events, dt)
+        for sprite in map.visible_sprites:
+            sprite.update(events, dt)
 
         # Draw background
         screen.fill(BG_COLOR)
         # (Insert drawing code here)
-        player.draw()
-        enemy.draw()
-        pygame.draw.rect(screen, (0, 0, 0), player.hitbox)
-        # pygame.draw.rect(screen, (0, 0, 0), player.rect)
-        pygame.draw.rect(screen, (0, 0, 0), enemy.hitbox)
-
-        debug(player.status)
-        debug(player.facing, 30)
-        debug(player.hitbox, 50)
-        debug(enemy.hitbox, 70)
+        for sprite in map.visible_sprites:
+            sprite.draw()
+        map.check_attack_collisions()
 
         # Update the display
         pygame.display.flip()
