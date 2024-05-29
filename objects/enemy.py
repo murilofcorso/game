@@ -13,9 +13,9 @@ class Enemy(Character):
         super().__init__()
         self.screen = pygame.display.get_surface()
 
-        self.width = 19
-        self.height = 34
         self.scale = 4
+        self.width = 19 * self.scale
+        self.height = 34 * self.scale
         self.sprites = {}
         self._load_sprites()
 
@@ -26,6 +26,7 @@ class Enemy(Character):
         self.hitbox = self.rect.inflate(-50*self.scale, -32*self.scale)
         self.hitbox.bottomleft = (150, SCREEN_HEIGHT-50)
 
+        self.offsets = {}
         self.flipped_sprite_offsets = {
             self.IDLE: 0,
             self.WALKING: 0,

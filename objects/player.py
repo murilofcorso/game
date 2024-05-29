@@ -9,23 +9,28 @@ class Player(Character):
     CHARGING = "charging"
 
     ANIMATION_SPEED = 60
-    ATTACK_ANIMATION_SPEED = 50
+    ATTACK_ANIMATION_SPEED = 500
 
-    ATTACK_RECT = (72, 37)
+    ATTACK_RECT = (78, 37)
 
     def __init__(self):
         super().__init__()
         self.screen = pygame.display.get_surface()
 
+        self.scale = 7
         self.width = 32
         self.height = 48
-        self.scale = 4
         self.sprites = {}
         self._load_sprites()
+
+        self.offsets = {
+            self.CHARGING: (8*self.scale, 4*self.scale),
+            self.ATTACKING: (4*self.scale, 0*self.scale)
+        }
         self.flipped_sprite_offsets = {
             self.IDLE: 0,
             self.RUNNING: 0,
-            self.ATTACKING: self.ATTACK_RECT[0] * self.scale,
+            self.ATTACKING: 64 * self.scale,
             self.CHARGING: 0
         }
         
@@ -78,6 +83,23 @@ class Player(Character):
                 if self.status != self.ATTACKING:
                     self.attack()
 
+
+    def check_cooldowns(self):
+        if self.status == self.ATTACKING and self.current_frame >= len(self.sprites[self.ATTACKING]) - 1:
+            self.status = self.IDLE
+            self.animation_speed = self.ANIMATION_SPEED
+
+
+    def create_attack_hitbox(self):
+        if self.status == self.ATTACKING and self.current_frame > 4:
+            if self.facing[0] == 1:
+                attack_hitbox = pygame.Rect(self.hitbox.right, self.hitbox.top, self.ATTACK_RECT[0]*self.scale, self.ATTACK_RECT[1]*self.scale)
+            elif self.facing[0] == -1:
+                attack_hitbox = pygame.Rect(self.hitbox.left - self.ATTACK_RECT[0]*self.scale, self.hitbox.top, self.ATTACK_RECT[0]*self.scale, self.ATTACK_RECT[1]*self.scale)
+
+    def check_attack_collisions(self):
+        pass
+
     def _load_sprites(self):
         self.sprites[self.IDLE] = self._load_sprite_sheet("sprites/blue-witch/B_witch_idle.png", 6)
         self.sprites[self.RUNNING] = self._load_sprite_sheet("sprites/blue-witch/B_witch_run.png", 8)
@@ -90,9 +112,9 @@ class Player(Character):
         self.events = events
         self.handle_events()
         self.move()
+        self.create_attack_hitbox()
+        self.check_cooldowns()
         self.previous_status = self.status
-        if self.status == self.ATTACKING and self.current_frame >= len(self.sprites[self.ATTACKING]) - 1:
-            self.status = self.IDLE
-            self.animation_speed = self.ANIMATION_SPEED
+        
         
 

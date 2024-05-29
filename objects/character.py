@@ -33,12 +33,16 @@ class Character(pygame.sprite.Sprite):
 
         self.image = self.sprites[self.status][self.current_frame]
         self.rect.center = self.hitbox.center
+        offset_x = self.offsets[self.status][0] if self.status in self.offsets.keys() else 0 
+        offset_y = self.offsets[self.status][1] if self.status in self.offsets.keys() else 0 
         if self.facing.x == -1:
             self.image = pygame.transform.flip(self.image, True, False)
             flipped_offset = self.flipped_sprite_offsets[self.status]
-            self.screen.blit(self.image, (self.rect.x - flipped_offset, self.rect.y))
+            position = (self.rect.x - flipped_offset - offset_x, self.rect.y - offset_y)
+            self.screen.blit(self.image, position)
         else:
-            self.screen.blit(self.image, (self.rect.x, self.rect.y))
+            position = (self.rect.x - offset_x, self.rect.y - offset_y)
+            self.screen.blit(self.image, position)
     
 
     

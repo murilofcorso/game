@@ -43,6 +43,7 @@ def main():
         player.draw()
         enemy.draw()
         pygame.draw.rect(screen, (0, 0, 0), player.hitbox)
+        # pygame.draw.rect(screen, (0, 0, 0), player.rect)
         pygame.draw.rect(screen, (0, 0, 0), enemy.hitbox)
 
         debug(player.status)
