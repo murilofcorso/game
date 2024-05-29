@@ -3,6 +3,7 @@ import sys
 from configs import *
 from map import Map
 from debug import debug
+from objects.enemy import Enemy
 
 # Initialize Pygame
 pygame.init()
@@ -38,7 +39,12 @@ def main():
         # (Insert drawing code here)
         for sprite in map.visible_sprites:
             sprite.draw()
+            if type(sprite) == Enemy:
+                debug(sprite.status)
+                debug(sprite.health, 30)
+                
         map.check_attack_collisions()
+        
 
         # Update the display
         pygame.display.flip()

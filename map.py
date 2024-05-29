@@ -18,5 +18,7 @@ class Map:
             if type(sprite) == Player and sprite.status == sprite.ATTACKING:
                 for collidable_sprite in self.collidable_sprites:
                     if sprite.attack_hitbox.colliderect(collidable_sprite.hitbox):
-                        collidable_sprite.take_damage()
+                        if collidable_sprite.is_vulnerable():
+                            collidable_sprite.take_damage()
+                            collidable_sprite.hitbox.x += 70 * sprite.facing[0]
                 

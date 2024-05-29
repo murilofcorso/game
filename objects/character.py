@@ -44,6 +44,3 @@ class Character(pygame.sprite.Sprite):
             position = (self.rect.x - offset_x, self.rect.y - offset_y)
             self.screen.blit(self.image, position)
     
-    def take_damage(self):
-        print("acertou")
-    

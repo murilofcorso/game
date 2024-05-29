@@ -6,12 +6,15 @@ class Enemy(Character):
     IDLE = "idle"
     WALKING = "walking"
     ATTACKING = "attacking"
+    TAKING_DAMAGE = "taking_damage"
 
     ANIMATION_SPEED = 100
 
     def __init__(self, groups):
         super().__init__(groups)
         self.screen = pygame.display.get_surface()
+
+        self.health = 100
 
         self.scale = 4
         self.width = 19 * self.scale
@@ -37,13 +40,39 @@ class Enemy(Character):
         self.time_since_last_frame = 0
         self.current_frame = 0
 
+        self.vulnerable = True
+        self.enemy_cooldowns = {
+            "HIT_COOLDOWN": 300
+        }
+        self.hit_tick = 0
+
 
     def _load_sprites(self):
         self.sprites[self.IDLE] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-idle.png", 4, "horizontal", 64, 64)
         self.sprites[self.WALKING] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-walk.png", 12, "horizontal", 64, 64)
         self.sprites[self.ATTACKING] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-attack.png", 13, "horizontal", 64, 64)
+        self.sprites[self.TAKING_DAMAGE] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-take-damage.png", 3, "horizontal", 64, 64)
+
+
+    def take_damage(self):
+        self.health -= 10
+        self.vulnerable = False
+        self.status = self.TAKING_DAMAGE
+        self.hit_tick = pygame.time.get_ticks()
+
+
+    def is_vulnerable(self):
+        return self.vulnerable
+
+
+    def cooldowns(self):
+        current_tick = pygame.time.get_ticks()
+        if current_tick - self.hit_tick > self.enemy_cooldowns["HIT_COOLDOWN"]:
+            self.vulnerable = True
+            self.status = self.IDLE
 
 
     def update(self, events, dt):
         self.dt = dt
         self.events = events
+        self.cooldowns()
