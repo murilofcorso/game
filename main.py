@@ -42,10 +42,13 @@ def main():
         # (Insert drawing code here)
         player.draw()
         enemy.draw()
+        pygame.draw.rect(screen, (0, 0, 0), player.hitbox)
+        pygame.draw.rect(screen, (0, 0, 0), enemy.hitbox)
 
         debug(player.status)
         debug(player.facing, 30)
-        debug(player.rect, 50)
+        debug(player.hitbox, 50)
+        debug(enemy.hitbox, 70)
 
         # Update the display
         pygame.display.flip()

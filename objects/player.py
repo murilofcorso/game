@@ -1,5 +1,6 @@
 import pygame
 from objects.character import Character
+from configs import *
 
 class Player(Character):
     IDLE = "idle"
@@ -18,15 +19,9 @@ class Player(Character):
 
         self.width = 32
         self.height = 48
-        self.scale = 7
+        self.scale = 4
         self.sprites = {}
         self._load_sprites()
-        self.sprite_offsets = {
-            self.IDLE: (0, 0),
-            self.RUNNING: (0, 0),
-            self.ATTACKING: (0, 0),
-            self.CHARGING: (8 * self.scale, 3 * self.scale),
-        }
         self.flipped_sprite_offsets = {
             self.IDLE: 0,
             self.RUNNING: 0,
@@ -36,8 +31,10 @@ class Player(Character):
         
         self.image = self.sprites[self.IDLE][0]
         self.rect = self.image.get_rect()
+        self.hitbox = self.rect.inflate(-19*self.scale, -16*self.scale)
+        self.hitbox.bottomleft = (0, SCREEN_HEIGHT-50)
 
-        self.facing = "right"
+        self.facing = pygame.Vector2((1, 0))
         self.status = self.IDLE
         self.previous_status = self.status
         self.speed = 9
@@ -55,12 +52,12 @@ class Player(Character):
 
             if self.can_move:
                 if keys[pygame.K_a]:
-                    self.rect.x -= self.speed
-                    self.facing = "left"
+                    self.hitbox.x -= self.speed
+                    self.facing.x = -1
                     self.status = self.RUNNING
                 if keys[pygame.K_d]:
-                    self.rect.x += self.speed
-                    self.facing = "right"
+                    self.hitbox.x += self.speed
+                    self.facing.x = 1
                     self.status = self.RUNNING
             if keys[pygame.K_SPACE]:
                 self.status = self.CHARGING

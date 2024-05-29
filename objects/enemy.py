@@ -1,5 +1,6 @@
 import pygame
 from objects.character import Character
+from configs import *
 
 class Enemy(Character):
     IDLE = "idle"
@@ -14,19 +15,17 @@ class Enemy(Character):
 
         self.width = 19
         self.height = 34
-        self.scale = 7
+        self.scale = 4
         self.sprites = {}
         self._load_sprites()
 
-        self.status = self.IDLE
-        self.facing = "right"
+        self.status = self.ATTACKING
+        self.facing = pygame.Vector2()
         self.image = self.sprites[self.IDLE][0]
         self.rect = self.image.get_rect()
-        self.sprite_offsets = {
-            self.IDLE: (20, 14),
-            self.WALKING: (20, 14),
-            self.ATTACKING: (20, 14)
-        }
+        self.hitbox = self.rect.inflate(-50*self.scale, -32*self.scale)
+        self.hitbox.bottomleft = (150, SCREEN_HEIGHT-50)
+
         self.flipped_sprite_offsets = {
             self.IDLE: 0,
             self.WALKING: 0,

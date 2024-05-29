@@ -20,7 +20,7 @@ class Character(pygame.sprite.Sprite):
                 sprites.append(frame)
         return sprites
     
-    
+
     def draw(self):
         self.time_since_last_frame += self.dt
 
@@ -32,13 +32,13 @@ class Character(pygame.sprite.Sprite):
             self.current_frame = 0
 
         self.image = self.sprites[self.status][self.current_frame]
-        offsets = self.sprite_offsets[self.status]
-        if self.facing == "left":
+        self.rect.center = self.hitbox.center
+        if self.facing.x == -1:
             self.image = pygame.transform.flip(self.image, True, False)
             flipped_offset = self.flipped_sprite_offsets[self.status]
-            self.screen.blit(self.image, (self.rect.x - flipped_offset - offsets[0], self.rect.y - offsets[1]))
+            self.screen.blit(self.image, (self.rect.x - flipped_offset, self.rect.y))
         else:
-            self.screen.blit(self.image, (self.rect.x - offsets[0], self.rect.y - offsets[1]))
+            self.screen.blit(self.image, (self.rect.x, self.rect.y))
     
 
     
