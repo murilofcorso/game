@@ -15,6 +15,7 @@ class Enemy(Character):
         self.screen = pygame.display.get_surface()
 
         self.health = 100
+        self.speed = 2
 
         self.scale = 4
         self.width = 19 * self.scale
@@ -22,8 +23,8 @@ class Enemy(Character):
         self.sprites = {}
         self._load_sprites()
 
-        self.status = self.ATTACKING
-        self.facing = pygame.Vector2()
+        self.status = self.IDLE
+        self.facing = pygame.Vector2((1, 0))
         self.image = self.sprites[self.IDLE][0]
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-50*self.scale, -32*self.scale)
@@ -34,6 +35,7 @@ class Enemy(Character):
             self.IDLE: 0,
             self.WALKING: 0,
             self.ATTACKING: 0,
+            self.TAKING_DAMAGE: 0
         }
 
         self.animation_speed = self.ANIMATION_SPEED
@@ -57,6 +59,7 @@ class Enemy(Character):
     def take_damage(self):
         self.health -= 10
         self.vulnerable = False
+        self.current_frame = 0
         self.status = self.TAKING_DAMAGE
         self.hit_tick = pygame.time.get_ticks()
 
@@ -67,9 +70,14 @@ class Enemy(Character):
 
     def cooldowns(self):
         current_tick = pygame.time.get_ticks()
-        if current_tick - self.hit_tick > self.enemy_cooldowns["HIT_COOLDOWN"]:
-            self.vulnerable = True
-            self.status = self.IDLE
+        if not self.is_vulnerable():
+            if current_tick - self.hit_tick > self.enemy_cooldowns["HIT_COOLDOWN"]:
+                self.vulnerable = True
+                self.status = self.IDLE
+
+
+    def move(self):
+        self.hitbox.x += self.speed * self.facing[0]
 
 
     def update(self, events, dt):

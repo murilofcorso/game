@@ -1,3 +1,4 @@
+import math
 import pygame
 from objects.player import Player
 from objects.enemy import Enemy
@@ -22,3 +23,24 @@ class Map:
                             collidable_sprite.take_damage()
                             collidable_sprite.hitbox.x += 70 * sprite.facing[0]
                 
+    
+    def move_enemys(self):
+        for sprite in self.visible_sprites:
+            if type(sprite) == Enemy:
+                center_player = self.player.hitbox.center
+                center_enemy = sprite.hitbox.center
+
+                if center_player[0] >= center_enemy[0]:
+                    sprite.facing[0] = 1
+                else:
+                    sprite.facing[0] = -1
+
+                sprite.distance_player = math.sqrt((center_player[0] - center_enemy[0])**2 + (center_player[1] - center_enemy[1])**2)
+                print(sprite.distance_player)
+
+                if sprite.status not in (sprite.TAKING_DAMAGE, sprite.ATTACKING):
+                    if sprite.distance_player < 1000:
+                        sprite.status = sprite.WALKING
+                        sprite.move()
+                    else:
+                        sprite.status = sprite.IDLE
