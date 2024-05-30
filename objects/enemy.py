@@ -9,6 +9,7 @@ class Enemy(Character):
     TAKING_DAMAGE = "taking_damage"
 
     ANIMATION_SPEED = 100
+    ATTACK_ANIMATION_SPEED = 60
 
     def __init__(self, groups):
         super().__init__(groups)
@@ -24,6 +25,7 @@ class Enemy(Character):
         self._load_sprites()
 
         self.status = self.IDLE
+        self.previous_status = self.status
         self.facing = pygame.Vector2((1, 0))
         self.image = self.sprites[self.IDLE][0]
         self.rect = self.image.get_rect()
@@ -48,6 +50,7 @@ class Enemy(Character):
         }
         self.hit_tick = 0
 
+        self.distance_player = 0
 
     def _load_sprites(self):
         self.sprites[self.IDLE] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-idle.png", 4, "horizontal", 64, 64)
@@ -76,11 +79,39 @@ class Enemy(Character):
                 self.status = self.IDLE
 
 
+    def can_move(self):
+        return self.status not in (self.ATTACKING, self.TAKING_DAMAGE)
+
+
     def move(self):
+        self.status = self.WALKING
         self.hitbox.x += self.speed * self.facing[0]
+
+
+    def set_animation_speed(self):
+        if self.status == self.ATTACKING:
+            self.animation_speed = self.ATTACK_ANIMATION_SPEED
+        else:
+            self.animation_speed = self.ANIMATION_SPEED
+
+
+    def attack(self):
+        if self.previous_status != self.ATTACKING:
+            self.current_frame = 0
+        self.status = self.ATTACKING
+        self.animation_speed = self.ATTACK_ANIMATION_SPEED
+
+
+    def handle_actions(self):
+        if (self.distance_player <= 130) or (self.previous_status == self.ATTACKING and self.current_frame != 0):
+            self.attack()     
 
 
     def update(self, events, dt):
         self.dt = dt
         self.events = events
         self.cooldowns()
+        self.handle_actions()
+        self.set_animation_speed()
+        self.previous_status = self.status
+        print(self.current_frame)
