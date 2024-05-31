@@ -1,8 +1,8 @@
 import pygame
-from objects.character import Character
+from objects.entity import Entity
 from configs import *
 
-class Enemy(Character):
+class Enemy(Entity):
     IDLE = "idle"
     WALKING = "walking"
     ATTACKING = "attacking"
@@ -47,18 +47,18 @@ class Enemy(Character):
 
         self.vulnerable = True
         self.enemy_cooldowns = {
-            "HIT_COOLDOWN": 300
+            "HIT_COOLDOWN": 400
         }
         self.hit_tick = 0
 
         self.distance_player = 0
 
     def _load_sprites(self):
-        self.sprites[self.IDLE] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-idle.png", 4, "horizontal", 64, 64)
-        self.sprites[self.WALKING] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-walk.png", 12, "horizontal", 64, 64)
-        self.sprites[self.ATTACKING] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-attack.png", 13, "horizontal", 64, 64)
-        self.sprites[self.TAKING_DAMAGE] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-take-damage.png", 3, "horizontal", 64, 64)
-        self.sprites[self.DIYING] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-death.png", 13, "horizontal", 64, 64)
+        self.sprites[self.IDLE] = self._load_sprite_sheet("sprites/skeleton-enemy/skeleton-idle.png", 4, "horizontal", 64, 64)
+        self.sprites[self.WALKING] = self._load_sprite_sheet("sprites/skeleton-enemy/skeleton-walk.png", 12, "horizontal", 64, 64)
+        self.sprites[self.ATTACKING] = self._load_sprite_sheet("sprites/skeleton-enemy/skeleton-attack.png", 13, "horizontal", 64, 64)
+        self.sprites[self.TAKING_DAMAGE] = self._load_sprite_sheet("sprites/skeleton-enemy/skeleton-take-damage.png", 3, "horizontal", 64, 64)
+        self.sprites[self.DIYING] = self._load_sprite_sheet("sprites/skeleton-enemy/skeleton-death.png", 13, "horizontal", 64, 64)
 
 
     def take_damage(self):
@@ -70,6 +70,18 @@ class Enemy(Character):
 
     def is_vulnerable(self):
         return self.vulnerable
+    
+
+    def is_attacking(self):
+        return self.status == self.ATTACKING
+
+
+    def is_alive(self):
+        return self.health >= 0
+    
+
+    def is_taking_damage(self):
+        return not self.is_vulnerable()
 
 
     def cooldowns(self):
@@ -81,7 +93,7 @@ class Enemy(Character):
 
 
     def can_move(self):
-        return self.status not in (self.ATTACKING, self.DIYING)
+        return self.distance_player < 1000 and self.status not in (self.ATTACKING, self.DIYING)
 
 
     def move(self):
@@ -102,32 +114,46 @@ class Enemy(Character):
 
 
     def can_attack(self):
-        return self.status not in (self.TAKING_DAMAGE, self.DIYING)
+        return self.distance_player <= 130 and self.status not in (self.TAKING_DAMAGE, self.DIYING)
 
 
     def die(self):
         self.status = self.DIYING
 
 
-    def handle_actions(self):
-        if (self.distance_player <= 130) and self.can_attack():
-            self.attack()
-
-        if self.health <= 0:
+    def handle_logic(self):
+        # check if is alive
+        if not self.is_alive():
+            # kill enemy if is not alive
             self.die()
+            # check if animation is finished
             if self.current_frame == len(self.sprites[self.DIYING])-1:
+                # eliminate enemy sprite
                 self.kill()
-
-        if not self.is_vulnerable():
-            self.status = self.TAKING_DAMAGE
-            self.speed = 1
         else:
-            self.speed = 2
+            # setting "default" status
+            self.status = self.IDLE
+
+        # check if can attack
+        if self.can_attack():
+            # attack
+            self.attack()
+        # check if can move
+        elif self.can_move():
+            # move
+            self.move()
+            # check if is taking damage
+            if self.is_taking_damage():
+                self.status = self.TAKING_DAMAGE
+                self.speed = 1
+            else:
+                self.speed = 2
+        
 
 
     def update(self, events, dt):
         self.dt = dt
         self.events = events
         self.cooldowns()
-        self.handle_actions()
+        self.handle_logic()
         self.set_animation_speed()

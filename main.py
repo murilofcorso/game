@@ -45,7 +45,7 @@ def main():
                 debug(sprite.current_frame, 50)
                 
         map.check_attack_collisions()
-        map.move_enemys()
+        map.set_player_enemy_distance()
         
 
         # Update the display

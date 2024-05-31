@@ -1,8 +1,8 @@
 import pygame
-from objects.character import Character
+from objects.entity import Entity
 from configs import *
 
-class Player(Character):
+class Player(Entity):
     IDLE = "idle"
     RUNNING = "running"
     ATTACKING = "attacking"

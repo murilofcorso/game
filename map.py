@@ -24,7 +24,7 @@ class Map:
                             collidable_sprite.hitbox.x += 70 * sprite.facing[0]
                 
     
-    def move_enemys(self):
+    def set_player_enemy_distance(self):
         for sprite in self.visible_sprites:
             if type(sprite) == Enemy:
                 center_player = self.player.hitbox.center
@@ -37,8 +37,3 @@ class Map:
 
                 sprite.distance_player = math.sqrt((center_player[0] - center_enemy[0])**2 + (center_player[1] - center_enemy[1])**2)
 
-
-                if sprite.distance_player < 1000 and sprite.can_move():
-                    sprite.move()
-                else:
-                    sprite.status = sprite.IDLE

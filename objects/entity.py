@@ -1,6 +1,6 @@
 import pygame
 
-class Character(pygame.sprite.Sprite):
+class Entity(pygame.sprite.Sprite):
     def __init__(self, groups):
         super().__init__(groups)
         self.last_status = None
