@@ -89,7 +89,6 @@ class Enemy(Entity):
         if not self.is_vulnerable():
             if current_tick - self.hit_tick > self.enemy_cooldowns["HIT_COOLDOWN"]:
                 self.vulnerable = True
-                self.status = self.IDLE
 
 
     def can_move(self):
@@ -130,6 +129,10 @@ class Enemy(Entity):
             if self.current_frame == len(self.sprites[self.DIYING])-1:
                 # eliminate enemy sprite
                 self.kill()
+        # check if is attacking
+        elif self.is_attacking() and self.current_frame < len(self.sprites[self.ATTACKING])-1:
+            # make sure to finish attack animation 
+            self.attack()
         else:
             # setting "default" status
             self.status = self.IDLE

@@ -41,8 +41,6 @@ def main():
             sprite.draw()
             if type(sprite) == Enemy:
                 debug(sprite.health)
-                debug(f"{sprite.status} {sprite.last_status}", 30)
-                debug(sprite.current_frame, 50)
                 
         map.check_attack_collisions()
         map.set_player_enemy_distance()
