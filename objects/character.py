@@ -1,6 +1,10 @@
 import pygame
 
 class Character(pygame.sprite.Sprite):
+    def __init__(self, groups):
+        super().__init__(groups)
+        self.last_status = None
+
     def _load_sprite_sheet(self, filepath, frame_count, direction="vertical", frame_height=None, frame_width=None):
         spritesheet = pygame.image.load(filepath)
         sprites = []
@@ -28,7 +32,7 @@ class Character(pygame.sprite.Sprite):
             self.current_frame += 1
             self.time_since_last_frame = 0
 
-        if self.current_frame >= len(self.sprites[self.status]):
+        if self.current_frame >= len(self.sprites[self.status]) or self.last_status != self.status:
             self.current_frame = 0
 
         self.image = self.sprites[self.status][self.current_frame]
@@ -43,4 +47,6 @@ class Character(pygame.sprite.Sprite):
         else:
             position = (self.rect.x - offset_x, self.rect.y - offset_y)
             self.screen.blit(self.image, position)
+        
+        self.last_status = self.status
     

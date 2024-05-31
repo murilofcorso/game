@@ -11,7 +11,7 @@ class Player(Character):
     ANIMATION_SPEED = 60
     ATTACK_ANIMATION_SPEED = 50
 
-    ATTACK_RECT = (78, 37)
+    ATTACK_RECT = (75, 37)
 
     def __init__(self, groups):
         super().__init__(groups)
@@ -41,7 +41,6 @@ class Player(Character):
 
         self.facing = pygame.Vector2((1, 0))
         self.status = self.IDLE
-        self.previous_status = self.status
         self.speed = 9
         self.can_move = True
 
@@ -115,7 +114,6 @@ class Player(Character):
         self.move()
         self.create_attack_hitbox()
         self.check_cooldowns()
-        self.previous_status = self.status
         
         
 

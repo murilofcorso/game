@@ -7,6 +7,7 @@ class Enemy(Character):
     WALKING = "walking"
     ATTACKING = "attacking"
     TAKING_DAMAGE = "taking_damage"
+    DIYING = "diying"
 
     ANIMATION_SPEED = 100
     ATTACK_ANIMATION_SPEED = 60
@@ -25,7 +26,6 @@ class Enemy(Character):
         self._load_sprites()
 
         self.status = self.IDLE
-        self.previous_status = self.status
         self.facing = pygame.Vector2((1, 0))
         self.image = self.sprites[self.IDLE][0]
         self.rect = self.image.get_rect()
@@ -37,7 +37,8 @@ class Enemy(Character):
             self.IDLE: 0,
             self.WALKING: 0,
             self.ATTACKING: 0,
-            self.TAKING_DAMAGE: 0
+            self.TAKING_DAMAGE: 0,
+            self.DIYING: 0
         }
 
         self.animation_speed = self.ANIMATION_SPEED
@@ -57,12 +58,12 @@ class Enemy(Character):
         self.sprites[self.WALKING] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-walk.png", 12, "horizontal", 64, 64)
         self.sprites[self.ATTACKING] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-attack.png", 13, "horizontal", 64, 64)
         self.sprites[self.TAKING_DAMAGE] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-take-damage.png", 3, "horizontal", 64, 64)
+        self.sprites[self.DIYING] = self._load_sprite_sheet("sprites\skeleton-enemy\skeleton-death.png", 13, "horizontal", 64, 64)
 
 
     def take_damage(self):
-        self.health -= 10
+        self.health -= 30
         self.vulnerable = False
-        self.current_frame = 0
         self.status = self.TAKING_DAMAGE
         self.hit_tick = pygame.time.get_ticks()
 
@@ -80,12 +81,13 @@ class Enemy(Character):
 
 
     def can_move(self):
-        return self.status not in (self.ATTACKING, self.TAKING_DAMAGE)
+        return self.status not in (self.ATTACKING, self.TAKING_DAMAGE, self.DIYING)
 
 
     def move(self):
         self.status = self.WALKING
         self.hitbox.x += self.speed * self.facing[0]
+
 
 
     def set_animation_speed(self):
@@ -96,15 +98,26 @@ class Enemy(Character):
 
 
     def attack(self):
-        if self.previous_status != self.ATTACKING:
-            self.current_frame = 0
         self.status = self.ATTACKING
         self.animation_speed = self.ATTACK_ANIMATION_SPEED
 
 
+    def can_attack(self):
+        return self.status not in (self.TAKING_DAMAGE, self.DIYING)
+
+
+    def die(self):
+        self.status = self.DIYING
+
+
     def handle_actions(self):
-        if (self.distance_player <= 130) or (self.previous_status == self.ATTACKING and self.current_frame != 0):
-            self.attack()     
+        if (self.distance_player <= 130) and self.can_attack():
+            self.attack()
+
+        if self.health <= 0:
+            self.die()
+            if self.current_frame >= len(self.sprites[self.DIYING])-1:
+                self.kill()
 
 
     def update(self, events, dt):
@@ -113,5 +126,3 @@ class Enemy(Character):
         self.cooldowns()
         self.handle_actions()
         self.set_animation_speed()
-        self.previous_status = self.status
-        print(self.current_frame)

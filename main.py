@@ -40,8 +40,9 @@ def main():
         for sprite in map.visible_sprites:
             sprite.draw()
             if type(sprite) == Enemy:
-                debug(sprite.status)
-                debug(sprite.hitbox, 30)
+                debug(sprite.health)
+                debug(f"{sprite.status} {sprite.last_status}", 30)
+                debug(sprite.current_frame, 50)
                 
         map.check_attack_collisions()
         map.move_enemys()
