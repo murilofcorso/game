@@ -37,8 +37,8 @@ class Map:
 
                 sprite.distance_player = math.sqrt((center_player[0] - center_enemy[0])**2 + (center_player[1] - center_enemy[1])**2)
 
-                if sprite.status not in (sprite.TAKING_DAMAGE):
-                    if sprite.distance_player < 1000 and sprite.can_move():
-                        sprite.move()
-                    else:
-                        sprite.status = sprite.IDLE
+
+                if sprite.distance_player < 1000 and sprite.can_move():
+                    sprite.move()
+                else:
+                    sprite.status = sprite.IDLE

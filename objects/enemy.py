@@ -81,13 +81,12 @@ class Enemy(Character):
 
 
     def can_move(self):
-        return self.status not in (self.ATTACKING, self.TAKING_DAMAGE, self.DIYING)
+        return self.status not in (self.ATTACKING, self.DIYING)
 
 
     def move(self):
         self.status = self.WALKING
         self.hitbox.x += self.speed * self.facing[0]
-
 
 
     def set_animation_speed(self):
@@ -116,8 +115,14 @@ class Enemy(Character):
 
         if self.health <= 0:
             self.die()
-            if self.current_frame >= len(self.sprites[self.DIYING])-1:
+            if self.current_frame == len(self.sprites[self.DIYING])-1:
                 self.kill()
+
+        if not self.is_vulnerable():
+            self.status = self.TAKING_DAMAGE
+            self.speed = 1
+        else:
+            self.speed = 2
 
 
     def update(self, events, dt):

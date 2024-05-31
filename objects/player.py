@@ -41,7 +41,7 @@ class Player(Character):
 
         self.facing = pygame.Vector2((1, 0))
         self.status = self.IDLE
-        self.speed = 9
+        self.speed = 5
         self.can_move = True
 
         self.current_frame = 0
