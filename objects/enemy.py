@@ -10,7 +10,7 @@ class Enemy(Entity):
     DIYING = "diying"
 
     ANIMATION_SPEED = 100
-    ATTACK_ANIMATION_SPEED = 60
+    ATTACK_ANIMATION_SPEED = 90
 
     def __init__(self, groups):
         super().__init__(groups)
@@ -77,7 +77,7 @@ class Enemy(Entity):
 
 
     def is_alive(self):
-        return self.health >= 0
+        return self.health > 0
     
 
     def is_taking_damage(self):
@@ -153,10 +153,30 @@ class Enemy(Entity):
                 self.speed = 2
         
 
+    def create_attack_hitboxes(self):
+        if self.status == self.ATTACKING:
+            if self.facing[0] == 1:
+                if self.current_frame == 4:
+                    self.attack_hitbox = pygame.Rect(self.rect.left + 13*self.scale, self.rect.top + 8*self.scale, 51*self.scale, 28*self.scale)
+                elif self.current_frame == 8:
+                    self.attack_hitbox = pygame.Rect(self.rect.left + 2*self.scale, self.rect.top + 16*self.scale, 62*self.scale, 24*self.scale)
+                else:
+                    self.attack_hitbox = pygame.Rect(0, 0, 0, 0)
+            elif self.facing[0] == -1:
+                if self.current_frame == 4:
+                    self.attack_hitbox = pygame.Rect(self.rect.left, self.rect.top + 8*self.scale, 51*self.scale, 28*self.scale)
+                elif self.current_frame == 8:
+                    self.attack_hitbox = pygame.Rect(self.rect.left, self.rect.top + 16*self.scale, 62*self.scale, 24*self.scale)
+                else:
+                    self.attack_hitbox = pygame.Rect(0, 0, 0, 0)
+        else:
+            self.attack_hitbox = pygame.Rect(0, 0, 0, 0)
+
 
     def update(self, events, dt):
         self.dt = dt
         self.events = events
+        self.create_attack_hitboxes()
         self.cooldowns()
         self.handle_logic()
         self.set_animation_speed()

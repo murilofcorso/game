@@ -40,7 +40,7 @@ def main():
         for sprite in map.visible_sprites:
             sprite.draw()
             if type(sprite) == Enemy:
-                debug(sprite.health)
+                pygame.draw.rect(screen, (255, 255, 255), sprite.attack_hitbox)
                 
         map.check_attack_collisions()
         map.set_player_enemy_distance()
